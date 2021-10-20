@@ -30,4 +30,23 @@ D_ZERO = [0, 1, 0, 1, 0, 1, 0,
           1, 0, 0, 1, 1, 1, 1,
           0, 0, 0, 1, 1, 1, 1]
 
+# Permutes the input based on the permutation described by 'indices'.
+# e.g 
+# - permute([10, 11, 12], [2, 3, 1]) => [11, 12, 10]
+# - permute([10, 11, 12], [1, 1, 1, 2]) => [10, 10, 10, 11]
+def permute(input, indices):
+      output = []
+      for i in indices:
+            output.append(input[i - 1])
+      return output
+
+# Performs a left shift n times on the input.
+# e.g
+# - leftShift([1, 2, 3, 4, 5], 1) => [2, 3, 4, 5, 1]
+# - leftShift([1, 2, 3, 4, 5], 7] => [3, 4, 5, 1, 2]
+def leftShift(input, n):
+      times = n % len(input)
+      output = input[times:len(input)]
+      output.extend(input[0:times])
+      return output
 
