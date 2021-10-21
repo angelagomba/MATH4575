@@ -1,7 +1,6 @@
 # K = 133457799BBCDFF1
 # x = 0123456789ABCDEF
 
-# K matrix
 K = [0, 0, 0, 1, 0, 0, 1, 1, 
       0, 0, 1, 1, 0, 1, 0, 0,
       0, 1, 0, 1, 0, 1, 1, 1,
@@ -10,6 +9,15 @@ K = [0, 0, 0, 1, 0, 0, 1, 1,
       1, 0, 1, 1, 1, 1, 0, 0,
       1, 1, 0, 1, 1, 1, 1, 1,
       1, 1, 1, 1, 0, 0, 0, 1]
+
+x = [0, 0, 0, 0, 0, 0, 0, 1,
+     0, 0, 1, 0, 0, 0, 1, 1,
+     0, 1, 0, 0, 0, 1, 0, 1,
+     0, 1, 1, 0, 0, 1, 1, 1,
+     1, 0, 0, 0, 1, 0, 0, 1,
+     1, 0, 1, 0, 1, 0, 1, 1,
+     1, 1, 0, 0, 1, 1, 0, 1,
+     1, 1, 1, 0, 1, 1, 1, 1]
 
 IP = [58, 50, 42, 34, 26, 18, 10, 2,
       60, 52, 44, 36, 28, 20, 12, 4,
@@ -94,6 +102,37 @@ def generateKeySchedule(key):
             k.append(ki)
       return k
 
+# Performs E: {0, 1}^32 -> {0, 1}^48
+# Takes an array of size 32 and returns an array of size 48 that is permuted by E
+def applyE(input):
+  E = [32, 1, 2, 3, 4, 5,
+        4, 5, 6, 7, 8, 9,
+        8, 9, 10, 11, 12, 13,
+        12, 13, 14, 15, 16, 17,
+        16, 17, 18, 19, 20, 21,
+        20, 21, 22, 23, 24, 25,
+        24, 25, 26, 27, 28, 29,
+        28, 29, 30, 31, 32, 1]
+  return permute(input, E)
+
+# Performs IP: {0, 1}^64 -> {0, 1}^64
+# Takes an array of size 64 (x) and returns 2 arrays of size 32 (L0 and R0) that are permuted by IP
+def getL0R0(input):
+  IPx = permute(input, IP)
+  L0 = IPx[:31]
+  R0 = IPx[32:]
+  return (L0, R0)
+
+# Returns a string that formats the input array into an n x m matrix
+def formatMatrix(input, m):
+  matrix = '['
+  for i in range(len(input)):
+    if i % m == 0 and i != 0:
+      matrix += '\n '
+    matrix += str(input[i])
+  matrix += ']'
+  return matrix
+
 ##### Answers #####
 
 print('a. Key Schedule')
@@ -101,3 +140,12 @@ schedule = generateKeySchedule(K)
 for i in range(len(schedule)):
       keyRound = ''.join([str(e) for e in schedule[i]])
       print(f'K{i + 1} = {keyRound}')
+
+print('b. E(R0)')
+(L0, R0) = getL0R0(x)
+E_R0 = applyE(R0)
+print(f'{formatMatrix(E_R0, 6)}')
+
+print('c. L1')
+
+print ('d. R1')
