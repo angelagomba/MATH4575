@@ -133,6 +133,16 @@ def formatMatrix(input, m):
   end_index = len(matrix) - 1
   return matrix[:end_index] + ']'
 
+# Takes two arrays of size 48 and returns an array of size 48 by XOR input1 with input2
+def xor(input1, input2):
+  xor = []
+  for i in range(len(input1)):
+    if input1[i] + input2[i] == 1:
+      xor.append(1)
+    else:
+      xor.append(0)
+  return xor
+
 ##### Answers #####
 
 print('a. Key Schedule')
@@ -151,3 +161,8 @@ print('Using L^i = R^(i-1), L^1 = R^0')
 print(f'{formatMatrix(R0, 8)}')
 
 print ('d. R^1')
+print('R^i = L^(i-1) + f(R^(i-1), K^i)')
+print('R^1 = L^0 + f(R^0, K^1)')
+# XOR E_R0 with K1
+XOR = xor(E_R0, schedule[0])
+print(f'{formatMatrix(XOR, 6)}')
