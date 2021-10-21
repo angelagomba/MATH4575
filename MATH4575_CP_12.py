@@ -129,7 +129,9 @@ def formatMatrix(input, m):
   for i in range(len(input)):
     if i % m == 0 and i != 0:
       matrix += '\n '
-    matrix += str(input[i])
+    matrix += f'{str(input[i])} '
+  end_index = len(matrix) - 1
+  matrix = matrix[:end_index]
   matrix += ']'
   return matrix
 
