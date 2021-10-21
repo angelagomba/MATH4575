@@ -131,9 +131,7 @@ def formatMatrix(input, m):
       matrix += '\n '
     matrix += f'{str(input[i])} '
   end_index = len(matrix) - 1
-  matrix = matrix[:end_index]
-  matrix += ']'
-  return matrix
+  return matrix[:end_index] + ']'
 
 ##### Answers #####
 
@@ -143,11 +141,13 @@ for i in range(len(schedule)):
       keyRound = ''.join([str(e) for e in schedule[i]])
       print(f'K{i + 1} = {keyRound}')
 
-print('b. E(R0)')
+print('b. E(R^0)')
 (L0, R0) = getL0R0(x)
 E_R0 = applyE(R0)
 print(f'{formatMatrix(E_R0, 6)}')
 
-print('c. L1')
+print('c. L^1')
+print('Using L^i = R^(i-1), L^1 = R^0')
+print(f'{formatMatrix(R0, 8)}')
 
-print ('d. R1')
+print ('d. R^1')
