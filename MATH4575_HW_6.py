@@ -29,6 +29,15 @@ IP = [58, 50, 42, 34, 26, 18, 10, 2,
       61, 53, 45, 37, 29, 21, 13, 5,
       63, 55, 47, 39, 31, 23, 15, 7]
 
+IP_INVERSE = [40, 8, 48, 16, 56, 24, 64, 32,
+              39, 7, 47, 15, 55, 23, 63, 31,
+              38, 6, 46, 14, 54, 22, 62, 30,
+              37, 5, 45, 13, 53, 21, 61, 29,
+              36, 4, 44, 12, 52, 20, 60, 28,
+              35, 3, 43, 11, 51, 19, 59, 27,
+              34, 2, 42, 10, 50, 18, 58, 26,
+              33, 1, 41, 9, 49, 17, 57, 25]
+
 # S-box constants ------------------------------------------------------------------------
 S1 = [[14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
       [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
@@ -209,10 +218,26 @@ def getR(L, R, K):
   return xor(L, f)
 
 # Compute y: y = (IP^-1)(L^16, R^16), then convert to hex
-# Returns a string representing the ciphertext
-def y(L, R):
-  # TODO: Implement
-  return ''
+# Returns an array of bits representing the ciphertext
+def y(L16, R16):
+  return permute(L16 + R16, IP_INVERSE)
+
+# Converts an array of bits into a hex string by chunking into 4 bit strings
+def toHex(bits):
+  res = ''
+  if (len(bits) % 4 != 0):
+    raise 'Input must have a length multiple of 4'
+  copy = bits.copy()
+  # break into chunks of 4
+  while len(copy) > 0:
+    # first digit in the chunk should be multiplied by 2^3, then 2^2, etc.
+    val = 8 * copy.pop(0)
+    val += 4 * copy.pop(0)
+    val += 2 * copy.pop(0)
+    val += 1 * copy.pop(0)
+    # convert the computed value into a hex string. We can drop the '0x' prefix.
+    res += hex(val)[2:3]
+  return res.upper()
 
 # Encrypts the given plaintext using the given key with the DES-cipher
 # Takes in two arrays representing the plaintext and key, and returns a string representing 
@@ -226,7 +251,7 @@ def descipherEncrypt(x, k):
     L = R # Update L to be R^(i-1)
     R = getR(prevL, R, keySchedule[i]) # Update R using L^(i-1), R^(i-1) and K^i
   ciphertext = y(L, R)
-  return ciphertext
+  return toHex(ciphertext)
 
 # Answer ---------------------------------------------------------------------------------
 print(f'The ciphertext is y = {descipherEncrypt(X, K)}')
