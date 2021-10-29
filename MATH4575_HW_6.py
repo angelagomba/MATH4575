@@ -93,7 +93,7 @@ def permute(input, indices):
 # Performs a left shift n times on the input.
 # e.g
 # - leftShift([1, 2, 3, 4, 5], 1) => [2, 3, 4, 5, 1]
-# - leftShift([1, 2, 3, 4, 5], 7] => [3, 4, 5, 1, 2]
+# - leftShift([1, 2, 3, 4, 5], 7) => [3, 4, 5, 1, 2]
 def leftShift(input, n):
       times = n % len(input)
       return input[times:len(input)] + input[0:times]
@@ -167,7 +167,7 @@ def getL0R0(input):
 
 # Performs a round: f(A, J) = f(R^(i-1), K^i)
 def round(A, J):
-  XOR = xor(A, J)
+  XOR = xor(applyE(A), J)
   p = [16, 7, 20, 21,
        29, 12, 28, 17,
        1, 15, 23, 26,
@@ -177,11 +177,12 @@ def round(A, J):
        19, 13, 30, 6,
        22, 11, 4, 25]
   c = []
+  # compute sbox for the 8 blocks of 6 digits in XOR
   for i in range(8):
-    row = sbox(''.join(str(e) for e in XOR[i:i+5]), i)
-    row_list = list([int(e) for e in row])
-    for j in range(len(row_list)):
-      c.append(row_list[j])
+    start = 6 * i
+    end = start + 6
+    row = sbox(''.join(str(e) for e in XOR[start:end]), i)
+    c += list([int(e) for e in row])
   return permute(c, p)
 
 # Uses the s-box to return a new matrix
