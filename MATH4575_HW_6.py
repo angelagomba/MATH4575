@@ -221,7 +221,7 @@ def getR(L, R, K):
 # Compute y: y = (IP^-1)(L^16, R^16), then convert to hex
 # Returns an array of bits representing the ciphertext
 def y(L16, R16):
-  return permute(L16 + R16, IP_INVERSE)
+  return permute(R16 + L16, IP_INVERSE)
 
 # Converts an array of bits into a hex string by chunking into 4 bit strings
 def toHex(bits):
@@ -239,6 +239,15 @@ def toHex(bits):
     # convert the computed value into a hex string. We can drop the '0x' prefix.
     res += hex(val)[2:3]
   return res.upper()
+
+# turn array of bits into a string in blocks of size n
+def printBits(bits, n):
+      string = ''
+      for i in range(len(bits)):
+            string += str(bits[i])
+            if (i%n) == (n-1):
+                  string += ' '
+      print(string)
 
 # Encrypts the given plaintext using the given key with the DES-cipher
 # Takes in two arrays representing the plaintext and key, and returns a string representing 
