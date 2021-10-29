@@ -1,24 +1,3 @@
-# Cryptosystem constants -----------------------------------------------------------------
-# K = 133457799BBCDFF1
-K = [0, 0, 0, 1, 0, 0, 1, 1, 
-      0, 0, 1, 1, 0, 1, 0, 0,
-      0, 1, 0, 1, 0, 1, 1, 1,
-      0, 1, 1, 1, 1, 0, 0, 1,
-      1, 0, 0, 1, 1, 0, 1, 1,
-      1, 0, 1, 1, 1, 1, 0, 0,
-      1, 1, 0, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 0, 0, 0, 1]
-
-# x = 0123456789ABCDEF
-X = [0, 0, 0, 0, 0, 0, 0, 1,
-     0, 0, 1, 0, 0, 0, 1, 1,
-     0, 1, 0, 0, 0, 1, 0, 1,
-     0, 1, 1, 0, 0, 1, 1, 1,
-     1, 0, 0, 0, 1, 0, 0, 1,
-     1, 0, 1, 0, 1, 0, 1, 1,
-     1, 1, 0, 0, 1, 1, 0, 1,
-     1, 1, 1, 0, 1, 1, 1, 1]
-
 # DES-Cipher constants -------------------------------------------------------------------
 IP = [58, 50, 42, 34, 26, 18, 10, 2,
       60, 52, 44, 36, 28, 20, 12, 4,
@@ -252,7 +231,7 @@ def printBits(bits, n):
 # Encrypts the given plaintext using the given key with the DES-cipher
 # Takes in two arrays representing the plaintext and key, and returns a string representing 
 # the encrypted ciphertext
-def descipherEncrypt(x, k):
+def desCipherEncrypt(x, k):
   (L, R) = getL0R0(x)
   keySchedule = generateKeySchedule(k)
   # Perform each round until we get L^16 and R^16
@@ -264,4 +243,25 @@ def descipherEncrypt(x, k):
   return toHex(ciphertext)
 
 # Answer ---------------------------------------------------------------------------------
-print(f'The ciphertext is y = {descipherEncrypt(X, K)}')
+# K = 133457799BBCDFF1
+K = [0, 0, 0, 1, 0, 0, 1, 1, 
+     0, 0, 1, 1, 0, 1, 0, 0,
+     0, 1, 0, 1, 0, 1, 1, 1,
+     0, 1, 1, 1, 1, 0, 0, 1,
+     1, 0, 0, 1, 1, 0, 1, 1,
+     1, 0, 1, 1, 1, 1, 0, 0,
+     1, 1, 0, 1, 1, 1, 1, 1,
+     1, 1, 1, 1, 0, 0, 0, 1]
+
+# x = 0123456789ABCDEF
+X = [0, 0, 0, 0, 0, 0, 0, 1,
+     0, 0, 1, 0, 0, 0, 1, 1,
+     0, 1, 0, 0, 0, 1, 0, 1,
+     0, 1, 1, 0, 0, 1, 1, 1,
+     1, 0, 0, 0, 1, 0, 0, 1,
+     1, 0, 1, 0, 1, 0, 1, 1,
+     1, 1, 0, 0, 1, 1, 0, 1,
+     1, 1, 1, 0, 1, 1, 1, 1]
+
+print(f'The ciphertext is y = {desCipherEncrypt(X, K)}')
+# The ciphertext is y = 85E813540F0AB405
