@@ -57,7 +57,8 @@ S8 = [[13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7],
       [1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2],
       [7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8],
       [2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11]]
-# ----------------------------------------------------------------------------------------
+
+# Helper Functions -----------------------------------------------------------------------
 
 # Permutes the input based on the permutation described by 'indices'.
 # e.g 
@@ -76,6 +77,45 @@ def permute(input, indices):
 def leftShift(input, n):
       times = n % len(input)
       return input[times:len(input)] + input[0:times]
+
+# Returns a string that formats the input array into an n x m matrix
+def formatMatrix(input, m):
+  matrix = '['
+  for i in range(len(input)):
+    if i % m == 0 and i != 0:
+      matrix += '\n '
+    matrix += f'{str(input[i])} '
+  end_index = len(matrix) - 1
+  return matrix[:end_index] + ']'
+
+# Takes two arrays of the same size and returns an array of that size by XOR input1 with input2
+def xor(input1, input2):
+  xor = []
+  for i in range(len(input1)):
+    if input1[i] + input2[i] == 1:
+      xor.append(1)
+    else:
+      xor.append(0)
+  return xor
+
+# Converts an array of bits into a hex string by chunking into 4 bit strings
+def toHex(bits):
+  res = ''
+  if (len(bits) % 4 != 0):
+    raise 'Input must have a length multiple of 4'
+  copy = bits.copy()
+  # break into chunks of 4
+  while len(copy) > 0:
+    # first digit in the chunk should be multiplied by 2^3, then 2^2, etc.
+    val = 8 * copy.pop(0)
+    val += 4 * copy.pop(0)
+    val += 2 * copy.pop(0)
+    val += 1 * copy.pop(0)
+    # convert the computed value into a hex string. We can drop the '0x' prefix.
+    res += hex(val)[2:3]
+  return res.upper()
+
+# Key Schedule ---------------------------------------------------------------------------
 
 # Performs PC1 and returns C0 and D0.
 # Takes an array of size 64 and returns a pair of arrays of size 28
@@ -123,6 +163,8 @@ def generateKeySchedule(key):
             k.append(ki)
       return k
 
+# Round Functions ------------------------------------------------------------------------
+
 # Performs E: {0, 1}^32 -> {0, 1}^48
 # Takes an array of size 32 and returns an array of size 48 that is permuted by E
 def applyE(input):
@@ -144,6 +186,14 @@ def getL0R0(input):
   R0 = IPx[32:]
   return (L0, R0)
 
+# Uses the s-box to return a new matrix
+def sbox(s, n):
+  sbox_n = {0: S1, 1: S2, 2: S3, 3: S4, 4: S5, 5: S6, 6: S7, 7: S8}
+  row = int(s[0] + s[-1], 2)
+  col = int(s[1:5], 2)
+  box = sbox_n[n]
+  return f'{box[row][col]:04b}'
+
 # Performs a round: f(A, J) = f(R^(i-1), K^i)
 def round(A, J):
   XOR = xor(applyE(A), J)
@@ -164,34 +214,6 @@ def round(A, J):
     c += list([int(e) for e in row])
   return permute(c, p)
 
-# Uses the s-box to return a new matrix
-def sbox(s, n):
-  sbox_n = {0: S1, 1: S2, 2: S3, 3: S4, 4: S5, 5: S6, 6: S7, 7: S8}
-  row = int(s[0] + s[-1], 2)
-  col = int(s[1:5], 2)
-  box = sbox_n[n]
-  return f'{box[row][col]:04b}'
-
-# Returns a string that formats the input array into an n x m matrix
-def formatMatrix(input, m):
-  matrix = '['
-  for i in range(len(input)):
-    if i % m == 0 and i != 0:
-      matrix += '\n '
-    matrix += f'{str(input[i])} '
-  end_index = len(matrix) - 1
-  return matrix[:end_index] + ']'
-
-# Takes two arrays of the same size and returns an array of that size by XOR input1 with input2
-def xor(input1, input2):
-  xor = []
-  for i in range(len(input1)):
-    if input1[i] + input2[i] == 1:
-      xor.append(1)
-    else:
-      xor.append(0)
-  return xor
-
 # R^i = L^(i-1) + f(R^(i-1), K^i)
 def getR(L, R, K):
   f = round(R, K)
@@ -201,32 +223,6 @@ def getR(L, R, K):
 # Returns an array of bits representing the ciphertext
 def y(L16, R16):
   return permute(R16 + L16, IP_INVERSE)
-
-# Converts an array of bits into a hex string by chunking into 4 bit strings
-def toHex(bits):
-  res = ''
-  if (len(bits) % 4 != 0):
-    raise 'Input must have a length multiple of 4'
-  copy = bits.copy()
-  # break into chunks of 4
-  while len(copy) > 0:
-    # first digit in the chunk should be multiplied by 2^3, then 2^2, etc.
-    val = 8 * copy.pop(0)
-    val += 4 * copy.pop(0)
-    val += 2 * copy.pop(0)
-    val += 1 * copy.pop(0)
-    # convert the computed value into a hex string. We can drop the '0x' prefix.
-    res += hex(val)[2:3]
-  return res.upper()
-
-# turn array of bits into a string in blocks of size n
-def printBits(bits, n):
-      string = ''
-      for i in range(len(bits)):
-            string += str(bits[i])
-            if (i%n) == (n-1):
-                  string += ' '
-      print(string)
 
 # Encrypts the given plaintext using the given key with the DES-cipher
 # Takes in two arrays representing the plaintext and key, and returns a string representing 
@@ -264,4 +260,4 @@ X = [0, 0, 0, 0, 0, 0, 0, 1,
      1, 1, 1, 0, 1, 1, 1, 1]
 
 print(f'The ciphertext is y = {desCipherEncrypt(X, K)}')
-# The ciphertext is y = 85E813540F0AB405
+# y = 85E813540F0AB405
