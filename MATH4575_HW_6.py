@@ -140,7 +140,7 @@ def generateKeySchedule(key):
             di = leftShift(d[i - 1], v(i))
             ki = pc2(ci, di)
             c.append(ci)
-            d.append(ci)
+            d.append(di)
             k.append(ki)
       return k
 
